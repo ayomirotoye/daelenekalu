@@ -2,7 +2,16 @@ const Item = require("../models/itemModel");
 
 exports.getAllItems = async (req, res) => {
   try {
-    const items = await Item.find();
+    let items = await Item.find();
+
+    const queryObj = { ...req.query };
+    const excludedFields = ["sort"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    // this allows us to fetch items by the tag pattern, and to get the list of items ordered by when they were created
+    if (req.query.tag) {
+      items = await Item.find({ tag: req.query.tag }).sort("+dateCreated");
+    }
 
     res.status(200).json({
       status: "success",
@@ -41,8 +50,7 @@ exports.createItem = async (req, res) => {
 exports.deleteItem = async (req, res) => {
   try {
     await Item.findByIdAndDelete(req.params.id);
-
-    res.status(204).json({
+    res.status(200).json({
       status: "success",
       message: "Item deleted",
     });
