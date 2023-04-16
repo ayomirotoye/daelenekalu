@@ -9,4 +9,5 @@ router
   .get(itemController.getAllItems)
   .post(itemController.createItem);
 
+router.route("/:id").delete(itemController.deleteItem);
 module.exports = router;
